@@ -31,7 +31,7 @@ def expandir_estados(x: int, y: int, matriz_pai: list[list[int]], nome_pai: Node
     global nos
 
     matriz_do_estado: list(list(int))
-
+    
     #Analisa a opcao de cima
     if x-1 >= 0:
         matriz_do_estado = mover_para_cima(matriz_pai, x, y)
@@ -99,37 +99,35 @@ def busca_a(no_pai: Node):
                 primeiro_acesso = True
             elif no.name[1] < menor_valor:
                 menor_valor = no.name[1]
-                menor_no = no
 
     for no in PreOrderIter(no_pai):
         if no.is_leaf and no.name[1] == menor_valor:
             nos_heuristica_menores.append(no)
 
-    print(nos_heuristica_menores)
-    return menor_no
+    return nos_heuristica_menores
 
 def funcao_principal():
     global estados_e_valores
     global nos
+    nos_analisados: list[Node] = []
     i = 0
 
     estado_salvo = tuple(tuple(item) for item in estado_inicial)
-    estados_e_valores[estado_salvo] = 0
+    estados_e_valores[estado_salvo] = 0 
     
     nos.append(Node(list(estados_e_valores.items())[-1]))
-    matriz_analisada = list(list(item) for item in nos[0].name[0])
-    no_analisado = nos[0]
+    nos_analisados.append(nos[0])
 
-    #while(matriz_analisada != estado_final):
-    while(i != 2):
-        x, y = procurar_localizacao_estado(0, matriz_analisada)
-        expandir_estados(x, y, matriz_analisada, no_analisado)
-        no_analisado = busca_a(nos[0])
-        matriz_analisada = list(list(item) for item in no_analisado.name[0])
+    while(True):
+        for no in nos_analisados:
+            matriz = list(list(list(item) for item in no.name[0]))
+            if matriz == estado_final:
+                print("Resultado atingido com sucesso em: ", i, " passos!" )
+                return
+            x, y = procurar_localizacao_estado(0, matriz)
+            expandir_estados(x, y, matriz, no)
+
+        nos_analisados = busca_a(nos[0])
         i+=1
-
-    print('----------------')
-    for pre, fill, node in RenderTree(nos[0]):
-        print("%s%s" % (pre, node.name))
 
 funcao_principal()
